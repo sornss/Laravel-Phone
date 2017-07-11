@@ -9,7 +9,6 @@ use Propaganistas\LaravelPhone\Exceptions\InvalidParameterException;
 
 class PhoneValidator
 {
-
     /**
      * @var \libphonenumber\PhoneNumberUtil
      */

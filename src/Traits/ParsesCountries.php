@@ -1,0 +1,34 @@
+<?php namespace Propaganistas\LaravelPhone\Traits;
+
+use Iso3166\Codes as ISO3166;
+
+trait ParsesCountries
+{
+    /**
+     * Determine whether the given country code is valid.
+     *
+     * @param string $country
+     * @return bool
+     */
+    public static function isCountryCode($country)
+    {
+        return ISO3166::isValid($country);
+    }
+
+    /**
+     * Parse the provided phone countries to a valid array.
+     *
+     * @param string|array $countries
+     * @return array
+     */
+    protected function parseCountries($countries)
+    {
+        $countries = is_array($countries) ? $countries : func_get_args();
+
+        return array_filter($countries, function ($code) {
+            $code = strtoupper($code);
+
+            return static::isCountryCode($code) ? $code : null;
+        });
+    }
+}
