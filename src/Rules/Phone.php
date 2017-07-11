@@ -1,5 +1,7 @@
 <?php namespace Propaganistas\LaravelPhone\Rules;
 
+use Illuminate\Support\Arr;
+use libphonenumber\PhoneNumberType;
 use Propaganistas\LaravelPhone\Traits\ParsesCountries;
 use Propaganistas\LaravelPhone\Traits\ParsesTypes;
 
@@ -46,7 +48,10 @@ class Phone
     {
         $countries = is_array($country) ? $country : func_get_args();
 
-        $this->countries = static::parseCountries($countries);
+        $this->countries = array_merge(
+            $this->countries,
+            static::parseCountries($countries)
+        );
 
         return $this;
     }
@@ -61,7 +66,34 @@ class Phone
     {
         $types = is_array($type) ? $type : func_get_args();
 
-        $this->types = static::parseTypesAsStrings($types);
+        $this->types = array_merge(
+            $this->types,
+            static::parseTypesAsStrings($types)
+        );
+
+        return $this;
+    }
+
+    /**
+     * Shortcut method for mobile type restriction.
+     *
+     * @return $this
+     */
+    public function mobile()
+    {
+        $this->type(PhoneNumberType::MOBILE);
+
+        return $this;
+    }
+
+    /**
+     * Shortcut method for fixed line type restriction.
+     *
+     * @return $this
+     */
+    public function fixedLine()
+    {
+        $this->type(PhoneNumberType::FIXED_LINE);
 
         return $this;
     }
