@@ -1,5 +1,6 @@
 <?php namespace Propaganistas\LaravelPhone;
 
+use Exception;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -14,7 +15,7 @@ use Propaganistas\LaravelPhone\Traits\ParsesFormats;
 use Propaganistas\LaravelPhone\Traits\ParsesTypes;
 use Serializable;
 
-class Phone implements Jsonable, JsonSerializable, Serializable
+class PhoneNumber implements Jsonable, JsonSerializable, Serializable
 {
     use ParsesCountries,
         ParsesFormats,
@@ -33,6 +34,11 @@ class Phone implements Jsonable, JsonSerializable, Serializable
      * @var array
      */
     protected $countries = [];
+
+    /**
+     * @var \libphonenumber\PhoneNumber
+     */
+    protected $instance;
 
     /**
      * @var \libphonenumber\PhoneNumberUtil
@@ -126,7 +132,9 @@ class Phone implements Jsonable, JsonSerializable, Serializable
      */
     public function format($format)
     {
-        if (! ($format = static::parseFormat($format))) {
+        $format = static::parseFormat($format);
+
+        if (is_null($format)) {
             return $this->throwFormatException('Unknown format "' . (string) $format . '"');
         }
 
@@ -150,7 +158,7 @@ class Phone implements Jsonable, JsonSerializable, Serializable
      */
     public function formatForCountry($country)
     {
-        if (! static::isCountryCode($country)) {
+        if (! static::isValidCountryCode($country)) {
             return $this->throwCountryException($country);
         }
 
@@ -169,7 +177,7 @@ class Phone implements Jsonable, JsonSerializable, Serializable
      */
     public function formatForMobileDialingInCountry($country, $removeFormatting = false)
     {
-        if (! static::isCountryCode($country)) {
+        if (! static::isValidCountryCode($country)) {
             return $this->throwCountryException($country);
         }
 
@@ -191,16 +199,42 @@ class Phone implements Jsonable, JsonSerializable, Serializable
     }
 
     /**
+     * Check if the phone number is of (a) given country(/countries).
+     *
+     * @param string $country
+     * @return bool
+     */
+    public function isOfCountry($country)
+    {
+        $countries = static::parseCountries($country);
+
+        return in_array($this->getCountry(), $countries, true);
+    }
+
+    /**
      * Get the phone number's type.
      *
      * @param bool $asConstant
-     * @return string|int
+     * @return string|int|null
      */
     public function getType($asConstant = false)
     {
         $type = $this->lib->getNumberType($this->getPhoneNumberInstance());
 
-        return $asConstant ? $type : array_search($type, static::$types);
+        return $asConstant ? $type : Arr::first(static::parseTypesAsStrings($type)) ?: null;
+    }
+
+    /**
+     * Check if the phone number is of (a) given type(s).
+     *
+     * @param string $type
+     * @return bool
+     */
+    public function isOfType($type)
+    {
+        $types = static::parseTypes($type);
+
+        return in_array($this->getType(true), $types, true);
     }
 
     /**
@@ -210,19 +244,26 @@ class Phone implements Jsonable, JsonSerializable, Serializable
      */
     public function getPhoneNumberInstance()
     {
+        // Got an instance cached?
+        if ($this->instance) {
+            return $this->instance;
+        }
+
         // Let's try each provided country.
         foreach ($this->countries as $country) {
             try {
-                return $this->lib->parse($this->number, $country);
+                return $this->instance = $this->lib->parse($this->number, $country);
             } catch (NumberParseException $exception) {
+                // Continue the loop.
             }
         }
 
         // Otherwise let's try to autodetect the country if the number is in international format.
         if (Str::startsWith($this->number, '+')) {
             try {
-                return $this->lib->parse($this->number, null);
+                return $this->instance = $this->lib->parse($this->number, null);
             } catch (NumberParseException $exception) {
+                // Proceed to throwing a custom exception.
             }
         }
 
@@ -300,6 +341,12 @@ class Phone implements Jsonable, JsonSerializable, Serializable
      */
     public function __toString()
     {
-        return $this->formatE164();
+        // Formatting the phone number could throw an exception, but __toString() doesn't cope well with that.
+        // Let's just return the original number in that case and create a log entry...
+        try {
+            return $this->formatE164();
+        } catch (Exception $exception) {
+            return $this->number;
+        }
     }
 }

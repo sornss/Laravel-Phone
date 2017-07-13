@@ -1,5 +1,6 @@
 <?php namespace Propaganistas\LaravelPhone\Traits;
 
+use Illuminate\Support\Collection;
 use Iso3166\Codes as ISO3166;
 
 trait ParsesCountries
@@ -10,7 +11,7 @@ trait ParsesCountries
      * @param string $country
      * @return bool
      */
-    public static function isCountryCode($country)
+    public static function isValidCountryCode($country)
     {
         return ISO3166::isValid($country);
     }
@@ -23,12 +24,12 @@ trait ParsesCountries
      */
     protected function parseCountries($countries)
     {
-        $countries = is_array($countries) ? $countries : func_get_args();
-
-        return array_filter($countries, function ($code) {
-            $code = strtoupper($code);
-
-            return static::isCountryCode($code) ? $code : null;
-        });
+        return Collection::make(is_array($countries) ? $countries : func_get_args())
+                         ->map(function ($country) {
+                             return strtoupper($country);
+                         })
+                         ->filter(function ($value) {
+                             return static::isValidCountryCode($value);
+                         })->toArray();
     }
 }

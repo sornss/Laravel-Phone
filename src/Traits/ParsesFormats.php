@@ -19,7 +19,7 @@ trait ParsesFormats
      * @param string $format
      * @return bool
      */
-    public static function isFormat($format)
+    public static function isValidFormat($format)
     {
         return ! is_null(static::parseFormat($format));
     }
@@ -35,7 +35,7 @@ trait ParsesFormats
         static::loadFormats();
 
         // If the format equals a constant's value, just return it.
-        if (in_array($format, static::$formats)) {
+        if (in_array($format, static::$formats, true)) {
             return $format;
         }
 

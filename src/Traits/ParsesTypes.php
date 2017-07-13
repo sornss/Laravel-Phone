@@ -1,13 +1,14 @@
 <?php namespace Propaganistas\LaravelPhone\Traits;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use libphonenumber\PhoneNumberType;
 use ReflectionClass;
 
 trait ParsesTypes
 {
     /**
-     * Array of available phone formats.
+     * Array of available phone types.
      *
      * @var array
      */
@@ -19,7 +20,7 @@ trait ParsesTypes
      * @param string $type
      * @return bool
      */
-    public static function isType($type)
+    public static function isValidType($type)
     {
         return ! is_null(static::parseTypes($type));
     }
@@ -34,17 +35,19 @@ trait ParsesTypes
     {
         static::loadTypes();
 
-        $types = is_array($types) ? $types : func_get_args();
+        return Collection::make(is_array($types) ? $types : func_get_args())
+                         ->map(function ($type) {
+                             // If the type equals a constant's value, just return it.
+                             if (in_array($type, static::$types, true)) {
+                                 return $type;
+                             }
 
-        return array_filter($types, function ($type) {
-            // If the type equals a constant's value, just return it.
-            if (in_array($type, static::$types)) {
-                return $type;
-            }
-
-            // Otherwise we'll assume the type is the constant's name.
-            return Arr::get(static::$types, strtoupper($type));
-        });
+                             // Otherwise we'll assume the type is the constant's name.
+                             return Arr::get(static::$types, strtoupper($type));
+                         })
+                         ->reject(function ($value) {
+                             return is_null($value) || $value === false;
+                         })->toArray();
     }
 
     /**
@@ -57,21 +60,22 @@ trait ParsesTypes
     {
         static::loadTypes();
 
-        $types = is_array($types) ? $types : func_get_args();
+        return Collection::make(is_array($types) ? $types : func_get_args())
+                         ->map(function ($type) {
+                             $type = strtoupper($type);
 
-        return array_filter($types, function ($type) {
-            $type = strtoupper($type);
+                             // If the type equals a constant's name, just return it.
+                             if (isset(static::$types[$type])) {
+                                 return $type;
+                             }
 
-            // If the type equals a constant's name, just return it.
-            if (isset(static::$types[$type])) {
-                return static::$types[$type];
-            }
-
-            // Otherwise we'll assume the type is the constant's value.
-            return array_search($type, static::$types);
-        });
+                             // Otherwise we'll assume the type is the constant's value.
+                             return array_search($type, static::$types);
+                         })
+                         ->reject(function ($value) {
+                             return is_null($value) || $value === false;
+                         })->toArray();
     }
-
 
     /**
      * Load all available formats once.

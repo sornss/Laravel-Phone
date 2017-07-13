@@ -1,6 +1,5 @@
 <?php namespace Propaganistas\LaravelPhone\Rules;
 
-use Illuminate\Support\Arr;
 use libphonenumber\PhoneNumberType;
 use Propaganistas\LaravelPhone\Traits\ParsesCountries;
 use Propaganistas\LaravelPhone\Traits\ParsesTypes;
@@ -15,14 +14,21 @@ class Phone
      *
      * @var array
      */
-    protected $countries = [];
+    protected $allowedCountries = [];
+
+    /**
+     * The input field name to check for a country value.
+     *
+     * @var string
+     */
+    protected $countryField;
 
     /**
      * The provided phone types.
      *
      * @var array
      */
-    protected $types = [];
+    protected $allowedTypes = [];
 
     /**
      * Whether the number's country should be auto-detected.
@@ -48,10 +54,23 @@ class Phone
     {
         $countries = is_array($country) ? $country : func_get_args();
 
-        $this->countries = array_merge(
-            $this->countries,
+        $this->allowedCountries = array_merge(
+            $this->allowedCountries,
             static::parseCountries($countries)
         );
+
+        return $this;
+    }
+
+    /**
+     * Set the country input field.
+     *
+     * @param string $name
+     * @return $this
+     */
+    public function countryField($name)
+    {
+        $this->countryField = $name;
 
         return $this;
     }
@@ -66,8 +85,8 @@ class Phone
     {
         $types = is_array($type) ? $type : func_get_args();
 
-        $this->types = array_merge(
-            $this->types,
+        $this->allowedTypes = array_merge(
+            $this->allowedTypes,
             static::parseTypesAsStrings($types)
         );
 
@@ -129,11 +148,14 @@ class Phone
      */
     public function __toString()
     {
-        return rtrim(sprintf('phone:%s,%s,%s,%s',
-            implode(',', $this->countries),
-            implode(',', $this->types),
-            $this->detect ? 'AUTO' : '',
-            $this->lenient ? 'LENIENT' : ''
-        ), ',');
+        $parameters = implode(',', array_merge(
+            $this->allowedCountries,
+            $this->allowedTypes,
+            ($this->countryField ? [$this->countryField]: []),
+            ($this->detect ? ['AUTO'] : []),
+            ($this->lenient ? ['LENIENT'] : [])
+        ));
+
+        return 'phone' . (! empty($parameters) ? ":$parameters" : '');
     }
 }
