@@ -15,12 +15,6 @@ matrix:
   fast_finish: true
   include:
     - php: 7.1
-      env: ILLUMINATE_VERSION=4.0.*
-    - php: 7.1
-      env: ILLUMINATE_VERSION=4.1.*
-    - php: 7.1
-      env: ILLUMINATE_VERSION=4.2.*
-    - php: 7.1
       env: ILLUMINATE_VERSION=5.0.*
     - php: 7.1
       env: ILLUMINATE_VERSION=5.1.*

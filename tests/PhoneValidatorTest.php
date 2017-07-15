@@ -1,21 +1,13 @@
 <?php namespace Propaganistas\LaravelPhone\Tests;
 
-use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberType;
-use Orchestra\Testbench\TestCase;
 use Propaganistas\LaravelPhone\Exceptions\InvalidParameterException;
-use Propaganistas\LaravelPhone\PhoneNumber;
 use Propaganistas\LaravelPhone\PhoneServiceProvider;
 use Propaganistas\LaravelPhone\Rules\Phone as Rule;
 
 class PhoneValidatorTest extends TestCase
 {
     protected $validator;
-
-    protected function getPackageProviders($application)
-    {
-        return [PhoneServiceProvider::class];
-    }
 
     public function setUp()
     {
@@ -24,7 +16,8 @@ class PhoneValidatorTest extends TestCase
         $this->validator = $this->app['validator'];
     }
 
-    public function testValidatePhoneWithDefaultCountryNoType()
+    /** @test */
+    public function it_validates_with_default_countries_without_type()
     {
         // Validator with correct country field.
         $this->assertTrue($this->validator->make(
@@ -56,8 +49,8 @@ class PhoneValidatorTest extends TestCase
             ['field' => 'phone:DE,NL'])->passes()
         );
     }
-
-    public function testValidatePhoneWithCountryFieldNoType()
+    /** @test */
+    public function it_validates_with_country_field_without_type()
     {
         // Validator with correct country field supplied.
         $this->assertTrue($this->validator->make(
@@ -72,7 +65,8 @@ class PhoneValidatorTest extends TestCase
         );
     }
 
-    public function testValidatePhoneWithDefaultCountryWithType()
+    /** @test */
+    public function it_validates_with_default_countries_with_type()
     {
         // Validator with correct country value, correct type.
         $this->assertTrue($this->validator->make(
@@ -123,7 +117,8 @@ class PhoneValidatorTest extends TestCase
         );
     }
 
-    public function testValidatePhoneWithCountryFieldWithType()
+    /** @test */
+    public function it_validates_with_country_field_with_type()
     {
         // Validator with correct country field supplied, correct type.
         $this->assertTrue($this->validator->make(
@@ -150,7 +145,8 @@ class PhoneValidatorTest extends TestCase
         );
     }
 
-    public function testValidatePhoneWithCustomCountryField()
+    /** @test */
+    public function it_validates_custom_country_field()
     {
         // Validator with correct country field supplied, correct type.
         $this->assertTrue($this->validator->make(
@@ -177,7 +173,8 @@ class PhoneValidatorTest extends TestCase
         );
     }
 
-    public function testValidatePhoneAutomaticDetectionFromInternationalInput()
+    /** @test */
+    public function it_validates_with_automatic_detection()
     {
         // Validator with correct international input.
         $this->assertTrue($this->validator->make(
@@ -210,7 +207,8 @@ class PhoneValidatorTest extends TestCase
         );
     }
 
-    public function testValidatePhoneNoDefaultCountryNoCountryField()
+    /** @test */
+    public function it_validates_without_countries()
     {
         // Validator with no country field or given country.
         $this->assertFalse($this->validator->make(
@@ -231,7 +229,8 @@ class PhoneValidatorTest extends TestCase
         )->passes());
     }
 
-    public function testInvalidParameterExceptionIsThrown()
+    /** @test */
+    public function it_throws_an_exception_for_invalid_parameters()
     {
         $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage('xyz,abc');
@@ -242,7 +241,8 @@ class PhoneValidatorTest extends TestCase
         )->passes());
     }
 
-    public function testValidatePhoneLenient()
+    /** @test */
+    public function it_validates_lenient()
     {
         // Validator with AU area code, lenient off
         $this->assertFalse($this->validator->make(
@@ -305,7 +305,8 @@ class PhoneValidatorTest extends TestCase
         );
     }
 
-    public function testValidatePhoneWithArrayInput()
+    /** @test */
+    public function it_validates_array_input()
     {
         if (PhoneServiceProvider::canUseDependentValidation()) {
             // Validator with correct country value.
@@ -419,25 +420,9 @@ class PhoneValidatorTest extends TestCase
             );
         }
     }
-    public function testHelperFunction()
-    {
-        // Test international landline number without country and format parameters.
-        $actual = phone('+32 12 34 56 78');
-        $expected = PhoneNumber::make('012345678', 'BE');
-        $this->assertEquals($expected, (string) $actual);
 
-        // Test landline number without format parameter.
-        $actual = phone('012345678', 'BE');
-        $expected = PhoneNumber::make('012345678', 'BE');
-        $this->assertEquals($expected, $actual);
-
-        // Test landline number with format parameter.
-        $actual = phone('012345678', 'BE', PhoneNumberFormat::NATIONAL);
-        $expected = '012 34 56 78';
-        $this->assertEquals($expected, $actual);
-    }
-
-    public function testRule()
+    /** @test */
+    public function it_has_a_rule_class()
     {
         $actual = new Rule;
         $expected = 'phone';

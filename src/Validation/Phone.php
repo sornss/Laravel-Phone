@@ -4,7 +4,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use libphonenumber\PhoneNumberUtil;
 use Propaganistas\LaravelPhone\Exceptions\InvalidParameterException;
-use Propaganistas\LaravelPhone\Exceptions\PhoneCountryException;
+use Propaganistas\LaravelPhone\Exceptions\CountryCodeException;
+use Propaganistas\LaravelPhone\Exceptions\NumberParseException;
 use Propaganistas\LaravelPhone\PhoneNumber;
 use Propaganistas\LaravelPhone\Traits\ParsesCountries;
 use Propaganistas\LaravelPhone\Traits\ParsesTypes;
@@ -64,12 +65,15 @@ class Phone
                     continue;
                 }
 
-                $phoneNumberInstance = $phoneNumber->getPhoneNumberInstance();
+                $lenientPhoneNumber = $phoneNumber->lenient()->getPhoneNumberInstance();
 
                 // Lenient validation.
-                if ($lenient && $this->lib->isPossibleNumber($phoneNumberInstance, $country)) {
+                if ($lenient && $this->lib->isPossibleNumber($lenientPhoneNumber, $country)) {
                     return true;
                 }
+
+                $phoneNumberInstance = $phoneNumber->getPhoneNumberInstance();
+
 
                 // Country detection.
                 if ($detect && $this->lib->isValidNumber($phoneNumberInstance)) {
@@ -80,7 +84,7 @@ class Phone
                 if ($this->lib->isValidNumberForRegion($phoneNumberInstance, $country)) {
                     return true;
                 }
-            } catch (PhoneCountryException $e) {
+            } catch (NumberParseException $e) {
                 continue;
             }
         }
@@ -118,7 +122,7 @@ class Phone
                                ->diff(['AUTO', 'LENIENT', $inputField]);
 
         if ($leftovers->isNotEmpty()) {
-            throw new InvalidParameterException($leftovers->implode(','));
+            throw InvalidParameterException::parameters($leftovers);
         }
 
         return [

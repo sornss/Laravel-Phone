@@ -22,11 +22,11 @@ trait ParsesTypes
      */
     public static function isValidType($type)
     {
-        return ! is_null(static::parseTypes($type));
+        return ! empty(static::parseTypes($type));
     }
 
     /**
-     * Parse a phone type.
+     * Parse a phone type into constant's value.
      *
      * @param string|array $types
      * @return array
@@ -60,21 +60,12 @@ trait ParsesTypes
     {
         static::loadTypes();
 
-        return Collection::make(is_array($types) ? $types : func_get_args())
-                         ->map(function ($type) {
-                             $type = strtoupper($type);
-
-                             // If the type equals a constant's name, just return it.
-                             if (isset(static::$types[$type])) {
-                                 return $type;
-                             }
-
-                             // Otherwise we'll assume the type is the constant's value.
-                             return array_search($type, static::$types);
-                         })
-                         ->reject(function ($value) {
-                             return is_null($value) || $value === false;
-                         })->toArray();
+        return array_keys(
+            array_intersect(
+                static::$types,
+                static::parseTypes($types)
+            )
+        );
     }
 
     /**
