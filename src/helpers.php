@@ -11,7 +11,7 @@ if (! function_exists('phone')) {
      * @param string       $format
      * @return string|Propaganistas\LaravelPhone\PhoneNumber
      */
-    function phone($number, $country = null, $format = null)
+    function phone($number, $country = [], $format = null)
     {
         $phone = PhoneNumber::make($number, $country);
 
