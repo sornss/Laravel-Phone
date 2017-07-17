@@ -116,8 +116,8 @@ A phone number can be wrapped in the `Propaganistas\LaravelPhone\PhoneNumber` cl
 ```php
 use Propaganistas\LaravelPhone\PhoneNumber;
 
-(string) PhoneNumber::make('+3212/34.56.78');            // +3212345678
-(string) PhoneNumber::make('012 34 56 78', 'BE');        // +3212345678
+(string) PhoneNumber::make('+3212/34.56.78');              // +3212345678
+(string) PhoneNumber::make('012 34 56 78', 'BE');          // +3212345678
 (string) PhoneNumber::make('012345678')->ofCountry('BE');  // +3212345678
 ```
 
