@@ -6,15 +6,12 @@ use Propaganistas\LaravelPhone\Traits\ParsesTypes;
 
 class Phone
 {
-    use ParsesCountries,
-        ParsesTypes;
-
     /**
      * The provided phone countries.
      *
      * @var array
      */
-    protected $allowedCountries = [];
+    protected $countries = [];
 
     /**
      * The input field name to check for a country value.
@@ -28,7 +25,7 @@ class Phone
      *
      * @var array
      */
-    protected $allowedTypes = [];
+    protected $types = [];
 
     /**
      * Whether the number's country should be auto-detected.
@@ -54,10 +51,7 @@ class Phone
     {
         $countries = is_array($country) ? $country : func_get_args();
 
-        $this->allowedCountries = array_merge(
-            $this->allowedCountries,
-            static::parseCountries($countries)
-        );
+        $this->countries = array_merge($this->countries, $countries);
 
         return $this;
     }
@@ -85,10 +79,7 @@ class Phone
     {
         $types = is_array($type) ? $type : func_get_args();
 
-        $this->allowedTypes = array_merge(
-            $this->allowedTypes,
-            static::parseTypesAsStrings($types)
-        );
+        $this->types = array_merge($this->types, $types);
 
         return $this;
     }
@@ -149,8 +140,8 @@ class Phone
     public function __toString()
     {
         $parameters = implode(',', array_merge(
-            $this->allowedCountries,
-            $this->allowedTypes,
+            $this->countries,
+            $this->types,
             ($this->countryField ? [$this->countryField]: []),
             ($this->detect ? ['AUTO'] : []),
             ($this->lenient ? ['LENIENT'] : [])

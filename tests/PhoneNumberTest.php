@@ -40,7 +40,7 @@ class PhoneNumberTest extends TestCase
     }
 
     /** @test */
-    public function it_can_return_the_number_s_country()
+    public function it_can_return_the_country()
     {
         $object = new PhoneNumber('012345678');
         $object = $object->ofCountry('NL', 'FR', 'BE');
@@ -51,7 +51,7 @@ class PhoneNumberTest extends TestCase
     }
 
     /** @test */
-    public function it_stores_the_number__country()
+    public function it_stores_the_country()
     {
         $object = new PhoneNumber('012345678');
         $object = $object->ofCountry('NL', 'FR', 'BE');
@@ -61,6 +61,19 @@ class PhoneNumberTest extends TestCase
         $object = new PhoneNumber('+3212345678');
         $object->getCountry();
         $this->assertAttributeEquals('BE', 'country', $object);
+    }
+
+    /** @test */
+    public function it_can_check_the_country()
+    {
+        $object = new PhoneNumber('012345678');
+        $object = $object->ofCountry('BE');
+        $this->assertTrue($object->isOfCountry('BE'));
+        $this->assertFalse($object->isOfCountry('US'));
+
+        $object = new PhoneNumber('+3212345678');
+        $this->assertTrue($object->isOfCountry('BE'));
+        $this->assertFalse($object->isOfCountry('US'));
     }
 
     /** @test */
@@ -265,10 +278,10 @@ class PhoneNumberTest extends TestCase
     /** @test */
     public function it_can_verify_types()
     {
-        /*$this->assertTrue(PhoneNumber::isValidType(PhoneNumberType::MOBILE));
-        $this->assertTrue(PhoneNumber::isValidType('mobile'));*/
+        $this->assertTrue(PhoneNumber::isValidType(PhoneNumberType::MOBILE));
+        $this->assertTrue(PhoneNumber::isValidType('mobile'));
         $this->assertFalse(PhoneNumber::isValidType(99999));
-        //$this->assertFalse(PhoneNumber::isValidType('foo'));
+        $this->assertFalse(PhoneNumber::isValidType('foo'));
     }
 
     /** @test */

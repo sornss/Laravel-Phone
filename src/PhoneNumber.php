@@ -214,6 +214,19 @@ class PhoneNumber implements Jsonable, JsonSerializable, Serializable
     }
 
     /**
+     * Check if the phone number is of (a) given country(ies).
+     *
+     * @param string|array $country
+     * @return bool
+     */
+    public function isOfCountry($country)
+    {
+        $countries = static::parseCountries($country);
+
+        return in_array($this->getCountry(), $countries);
+    }
+
+    /**
      * Filter the provided countries to the one that is valid for the number.
      *
      * @param string|array $countries
@@ -262,7 +275,7 @@ class PhoneNumber implements Jsonable, JsonSerializable, Serializable
             return $type;
         }
 
-        $stringType = Arr::first(static::parseTypesAsStrings($type));
+        $stringType = Arr::get(static::parseTypesAsStrings($type), 0);
 
         return $stringType ? strtolower($stringType) : null;
     }
