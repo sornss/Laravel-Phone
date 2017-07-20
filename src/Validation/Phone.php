@@ -114,12 +114,12 @@ class Phone
 
         // Force developers to write proper code.
         // Since the static parsers return a validated array with preserved keys, we can safely diff against the keys.
-        $leftovers = Collection::make($parameters)
-                               ->diffKeys($types)
-                               ->diffKeys($inputCountry ? [] : $countries)
-                               ->diff(['AUTO', 'LENIENT', $inputField]);
+        // We can't use $collection->diffKeys() since it's not available yet in earlier 5.* versions. Sad story.
+        $leftovers = array_diff_key($parameters, $types);
+        $leftovers = array_diff_key($leftovers, $inputCountry ? [] : $countries);
+        $leftovers = array_diff($leftovers, ['AUTO', 'LENIENT', $inputField]);
 
-        if ($leftovers->isNotEmpty()) {
+        if (! empty($leftovers)) {
             throw InvalidParameterException::parameters($leftovers);
         }
 
