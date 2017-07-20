@@ -104,7 +104,7 @@ class Phone
         // Discover if an input field was provided. If not, guess the field's name.
         $inputField = Collection::make($parameters)
                                 ->intersect(array_keys(Arr::dot($data)))
-                                ->first(null, "${attribute}_country");
+                                ->first() ?: "${attribute}_country";
 
         // Attempt to retrieve the field's value. If no field is present, this will be null.
         $inputCountry = Arr::get($data, $inputField);
