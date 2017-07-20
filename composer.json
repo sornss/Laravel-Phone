@@ -16,6 +16,7 @@
         }
     ],
     "require": {
+        "php": ">=5.5",
         "illuminate/support": "^5.0",
         "illuminate/validation": "^5.0",
         "giggsey/libphonenumber-for-php": "^7.0|^8.0",

@@ -2,6 +2,9 @@
 
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberType;
+use Propaganistas\LaravelPhone\Exceptions\CountryCodeException;
+use Propaganistas\LaravelPhone\Exceptions\NumberFormatException;
+use Propaganistas\LaravelPhone\Exceptions\NumberParseException;
 use Propaganistas\LaravelPhone\PhoneNumber;
 
 class PhoneNumberTest extends TestCase
@@ -10,7 +13,7 @@ class PhoneNumberTest extends TestCase
     public function it_can_construct()
     {
         $object = new PhoneNumber('012345678');
-        $this->assertInstanceOf('Propaganistas\LaravelPhone\PhoneNumber', $object);
+        $this->assertInstanceOf(PhoneNumber::class, $object);
         $this->assertAttributeEquals('012345678', 'number', $object);
     }
 
@@ -77,7 +80,7 @@ class PhoneNumberTest extends TestCase
     public function it_can_make()
     {
         $object = PhoneNumber::make('012345678');
-        $this->assertInstanceOf('Propaganistas\LaravelPhone\PhoneNumber', $object);
+        $this->assertInstanceOf(PhoneNumber::class, $object);
         $this->assertAttributeEquals('012345678', 'number', $object);
 
         $object = PhoneNumber::make('012345678', 'BE');
@@ -107,7 +110,7 @@ class PhoneNumberTest extends TestCase
     /** @test */
     public function it_throws_an_exception_when_formatting_non_international_number_without_given_country()
     {
-        $this->expectException('Propaganistas\LaravelPhone\Exceptions\NumberParseException');
+        $this->expectException(NumberParseException::class);
         $this->expectExceptionMessage('012345678');
 
         $object = new PhoneNumber('012345678');
@@ -128,7 +131,7 @@ class PhoneNumberTest extends TestCase
     /** @test */
     public function it_throws_an_exception_for_invalid_formats()
     {
-        $this->expectException('Propaganistas\LaravelPhone\Exceptions\NumberFormatException');
+        $this->expectException(NumberFormatException::class);
         $this->expectExceptionMessage('foo');
 
         $object = new PhoneNumber('012345678');
@@ -203,7 +206,7 @@ class PhoneNumberTest extends TestCase
     /** @test */
     public function it_throws_an_exception_when_an_invalid_country_is_provided_for_formatting_for_dialing()
     {
-        $this->expectException('Propaganistas\LaravelPhone\Exceptions\CountryCodeException');
+        $this->expectException(CountryCodeException::class);
         $this->expectExceptionMessage('foo');
 
         $object = new PhoneNumber('+3212345678');
@@ -213,7 +216,7 @@ class PhoneNumberTest extends TestCase
     /** @test */
     public function it_throws_an_exception_when_an_invalid_country_is_provided_for_formatting_for_mobile_dialing()
     {
-        $this->expectException('Propaganistas\LaravelPhone\Exceptions\CountryCodeException');
+        $this->expectException(CountryCodeException::class);
         $this->expectExceptionMessage('foo');
 
         $object = new PhoneNumber('+3212345678');
@@ -232,7 +235,7 @@ class PhoneNumberTest extends TestCase
     /** @test */
     public function it_throws_an_exception_when_the_number_could_not_be_parsed()
     {
-        $this->expectException('Propaganistas\LaravelPhone\Exceptions\NumberParseException');
+        $this->expectException(NumberParseException::class);
         $this->expectExceptionMessage('45678');
 
         $object = new PhoneNumber('45678');
@@ -300,7 +303,7 @@ class PhoneNumberTest extends TestCase
         $this->assertInternalType('string', $serialized);
 
         $unserialized = unserialize($serialized);
-        $this->assertInstanceOf('Propaganistas\LaravelPhone\PhoneNumber', $unserialized);
+        $this->assertInstanceOf(PhoneNumber::class, $unserialized);
         $this->assertAttributeEquals('+3212345678', 'number', $unserialized);
         $this->assertAttributeEquals('BE', 'country', $unserialized);
     }

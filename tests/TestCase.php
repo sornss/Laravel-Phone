@@ -1,6 +1,7 @@
 <?php namespace Propaganistas\LaravelPhone\Tests;
 
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use Propaganistas\LaravelPhone\PhoneServiceProvider;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -10,6 +11,6 @@ abstract class TestCase extends BaseTestCase
      */
     protected function getPackageProviders($application)
     {
-        return ['Propaganistas\LaravelPhone\PhoneServiceProvider'];
+        return [PhoneServiceProvider::class];
     }
 }
