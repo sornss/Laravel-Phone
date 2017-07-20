@@ -233,7 +233,7 @@ class PhoneValidatorTest extends TestCase
     /** @test */
     public function it_throws_an_exception_for_invalid_parameters()
     {
-        $this->expectException(InvalidParameterException::class);
+        $this->expectException('Propaganistas\LaravelPhone\Exceptions\InvalidParameterException');
         $this->expectExceptionMessage('xyz,abc');
 
         $this->assertFalse($this->validator->make(

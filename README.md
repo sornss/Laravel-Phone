@@ -59,7 +59,7 @@ To validate a phone number, use the `phone` keyword in your validation rules arr
 
     ```php
     'phonefield'       => 'phone:US,BE',
-    // or 'phonefield' => Rule::phone()->country(['US', 'BE'])
+    // 'phonefield' => Rule::phone()->country(['US', 'BE'])
     ```
 
   The validator will check if the number is valid in at least one of provided countries, so feel free to add as many country codes as you like.
@@ -68,13 +68,13 @@ To validate a phone number, use the `phone` keyword in your validation rules arr
 
     ```php
     'phonefield'            => 'phone',
-    // or 'phonefield'      => Rule::phone()
+    // 'phonefield'      => Rule::phone()
     'phonefield_country'    => 'required_with:phonefield',
     ```
 
     ```php
     'phonefield'            => 'phone:custom_country_field',
-    // or 'phonefield'      => Rule::phone()->countryField('custom_country_field')
+    // 'phonefield'      => Rule::phone()->countryField('custom_country_field')
     'custom_country_field'  => 'required_with:phonefield',
     ```
 
@@ -88,7 +88,7 @@ To validate a phone number, use the `phone` keyword in your validation rules arr
 
     ```php
     'phonefield'       => 'phone:AUTO,US',
-    // or 'phonefield' => Rule::phone()->detect()->country('US')
+    // 'phonefield' => Rule::phone()->detect()->country('US')
     ```
 
   The validator will try to extract the country from the number itself and then check if the number is valid for that country. If the country could not be guessed it will be validated using the fallback countries if provided. Note that country guessing will only work when phone numbers are entered in *international format* (prefixed with a `+` sign, e.g. +32 ....). Leading double zeros will **NOT** be parsed correctly as this isn't an established consistency.
@@ -97,8 +97,8 @@ To specify constraints on the number type, just append the allowed types to the 
 
 ```php
 'phonefield'       => 'phone:US,BE,mobile',
-// or 'phonefield' => Rule::phone()->country(['US', 'BE'])->type('mobile')
-// or 'phonefield' => Rule::phone()->country('US', 'BE')->mobile()
+// 'phonefield' => Rule::phone()->country(['US', 'BE'])->type('mobile')
+// 'phonefield' => Rule::phone()->country('US', 'BE')->mobile()
 ```
 The most common types are `mobile` and `fixed_line`, but feel free to use any of the types defined [here](https://github.com/giggsey/libphonenumber-for-php/blob/master/src/PhoneNumberType.php).
 
@@ -106,7 +106,7 @@ You can also enable more lenient validation (for example, fixed lines without ar
 
 ```php
 'phonefield'       => 'phone:LENIENT,US',
-// or 'phonefield' => Rule::phone()->lenient()->country('US')
+// 'phonefield' => Rule::phone()->lenient()->country('US')
 ```
 
 ## Utility PhoneNumber class
