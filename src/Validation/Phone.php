@@ -114,9 +114,8 @@ class Phone
 
         // Force developers to write proper code.
         // Since the static parsers return a validated array with preserved keys, we can safely diff against the keys.
-        // We can't use $collection->diffKeys() since it's not available yet in earlier 5.* versions. Sad story.
-        $leftovers = array_diff_key($parameters, $types);
-        $leftovers = array_diff_key($leftovers, $inputCountry ? [] : $countries);
+        // Unfortunately we can't use $collection->diffKeys() as it's not available yet in earlier 5.* versions.
+        $leftovers = array_diff_key($parameters, $types, $inputCountry ? [] : $countries);
         $leftovers = array_diff($leftovers, ['AUTO', 'LENIENT', $inputField]);
 
         if (! empty($leftovers)) {
